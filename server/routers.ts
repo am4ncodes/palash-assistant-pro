@@ -4,11 +4,13 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { invokeLLM } from "./_core/llm";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { createDocument, cacheTranslation, getDb, getProgress, listDocuments, saveProgress } from "./db";
+import { createAudioArtifact, createDocument, cacheTranslation, getDb, getProgress, listAudioArtifacts, listDocuments, saveProgress } from "./db";
 import { documents, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
-import { storagePut } from "./storage";
+import { storageGetSignedUrl, storagePut } from "./storage";
 import { PDFParse } from "pdf-parse";
+import { synthesizeSpeech } from "./tts";
+import { shouldUseOcr } from "./ocr";
 
 const translationInput = z.object({
   sourceLanguage: z.string().min(2).max(32),
@@ -68,6 +70,11 @@ export const appRouter = router({
       });
       return { speechText: responseText(response), language: input.language, source: "secure-server-tts" as const };
     }),
+    audioHistory: protectedProcedure.query(({ ctx }) => listAudioArtifacts(ctx.user.id)),
+    generateAudio: protectedProcedure.input(z.object({ text: z.string().min(1).max(2000), language: z.string().min(2).max(32), voiceId: z.string().max(64).optional() })).mutation(async ({ ctx, input }) => {
+      const audio = await synthesizeSpeech(input);
+      return createAudioArtifact({ userId: ctx.user.id, text: input.text, language: input.language, fileKey: audio.key, fileUrl: audio.url });
+    }),
   }),
   documents: router({
     list: protectedProcedure.query(({ ctx }) => listDocuments(ctx.user.id)),
@@ -80,7 +87,18 @@ export const appRouter = router({
       const parser = new PDFParse({ data: buffer });
       const parsed = await parser.getText();
       await parser.destroy();
-      return createDocument({ userId: ctx.user.id, filename: input.filename, mimeType: input.mimeType, fileKey: stored.key, fileUrl: stored.url, extractedText: parsed.text.slice(0, 100_000), pageCount: parsed.total });
+      let extractedText = parsed.text.trim();
+      let extractionMode: "text-layer" | "cloud-ocr" = "text-layer";
+      if (shouldUseOcr(extractedText)) {
+        const signedUrl = await storageGetSignedUrl(stored.key);
+        const ocrResponse = await invokeLLM({
+          model: "gemini-3-flash-preview",
+          messages: [{ role: "user", content: [{ type: "text", text: "Extract all readable text from this scanned PDF. Preserve page order and return plain text only." }, { type: "file_url", file_url: { url: signedUrl, mime_type: "application/pdf" } }] }],
+        });
+        extractedText = responseText(ocrResponse);
+        extractionMode = "cloud-ocr";
+      }
+      return createDocument({ userId: ctx.user.id, filename: input.filename, mimeType: input.mimeType, fileKey: stored.key, fileUrl: stored.url, extractedText: extractedText.slice(0, 100_000), extractionMode, pageCount: parsed.total });
     }),
   }),
 });

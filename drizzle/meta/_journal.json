@@ -15,6 +15,20 @@
       "when": 1787830322436,
       "tag": "0001_tiresome_the_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787831559021,
+      "tag": "0002_awesome_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1787831991806,
+      "tag": "0003_legal_wolverine",
+      "breakpoints": true
     }
   ]
 }

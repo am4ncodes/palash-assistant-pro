@@ -185,3 +185,13 @@ The highest-value next step is to introduce a `services/` layer with `translatio
 [2]: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage "MDN Web Docs — Window: localStorage property"
 
 [3]: https://react.dev/reference/react/lazy "React documentation — lazy"
+
+## 8. Product-grade integrations
+
+The full-stack layer now treats translation, audio, documents, and progress as protected user-owned capabilities. AI translation is exposed through `ai.translate`; speech preparation remains a protected fallback path; high-quality downloadable audio uses `ai.generateAudio`, the server-only ElevenLabs adapter, and S3-backed `audio_artifacts` metadata.
+
+PDF ingestion follows a two-stage parser. The server first uses the PDF text layer for speed. When the extracted text is empty or sparse, it requests cloud OCR from the multimodal `gemini-3-flash-preview` model using a signed storage URL. Each document records `extractionMode` as `text-layer` or `cloud-ocr`, and the Library renders that provenance so teachers can understand how a preview was produced.
+
+Profile analytics are derived from the same durable progress contract used by the learning page. The chart layer displays a weekly activity view and per-phrase mastery with readable summary cards, while export produces a portable JSON snapshot. The `FeaturesPage` acts as a searchable product map with 52 grouped modules across language, audio, classroom, library, community, and operations; status labels intentionally distinguish live behavior from in-motion modules.
+
+The reusable process is packaged separately at `/home/ubuntu/skills/palash-product-builder/SKILL.md`. It captures the sequence for routing, local-first state, secure AI procedures, storage-backed document ingestion, analytics, testing, and repository handoff.

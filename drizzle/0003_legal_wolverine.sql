@@ -1,0 +1,1 @@
+ALTER TABLE `documents` ADD `extractionMode` varchar(32) DEFAULT 'text-layer' NOT NULL;

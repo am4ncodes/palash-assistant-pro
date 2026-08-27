@@ -31,6 +31,16 @@ export const translationCache = mysqlTable("translation_cache", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+export const audioArtifacts = mysqlTable("audio_artifacts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  text: text("text").notNull(),
+  language: varchar("language", { length: 32 }).notNull(),
+  fileKey: varchar("fileKey", { length: 512 }).notNull(),
+  fileUrl: varchar("fileUrl", { length: 1024 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export const documents = mysqlTable("documents", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
@@ -39,6 +49,7 @@ export const documents = mysqlTable("documents", {
   fileKey: varchar("fileKey", { length: 512 }).notNull(),
   fileUrl: varchar("fileUrl", { length: 1024 }).notNull(),
   extractedText: text("extractedText"),
+  extractionMode: varchar("extractionMode", { length: 32 }).default("text-layer").notNull(),
   pageCount: int("pageCount").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
@@ -47,3 +58,4 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type LearningProgress = typeof learningProgress.$inferSelect;
 export type Document = typeof documents.$inferSelect;
+export type AudioArtifact = typeof audioArtifacts.$inferSelect;

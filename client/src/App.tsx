@@ -18,6 +18,7 @@ const routes = [
   { path: "/library", component: lazy(() => import("./pages/LibraryPage")) },
   { path: "/community", component: lazy(() => import("./pages/CommunityPage")) },
   { path: "/profile", component: lazy(() => import("./pages/ProfilePage")) },
+  { path: "/features", component: lazy(() => import("./pages/FeaturesPage")) },
   { path: "/404", component: lazy(() => import("./pages/NotFound")) },
 ];
 function Router() {

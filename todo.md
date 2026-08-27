@@ -15,3 +15,121 @@
 - [x] Add authenticated profile and persistent progress UI.
 - [x] Add PDF upload, parsing, storage, and document viewer flow.
 - [x] Validate security, type checks, build, and user flows.
+
+## Product-grade expansion backlog
+
+- [ ] Create reusable Palash development skill package.
+- [ ] Add OCR fallback for scanned PDFs.
+- [ ] Add OCR confidence and manual correction state.
+- [ ] Add dedicated cloud TTS provider abstraction.
+- [ ] Add downloadable audio files for translations.
+- [ ] Add audio history and replay controls.
+- [ ] Add profile learning progress charts.
+- [ ] Add weekly activity chart.
+- [ ] Add phrase mastery chart.
+- [ ] Add lesson streak tracking.
+- [ ] Add authenticated onboarding flow.
+- [ ] Add profile avatar and initials fallback.
+- [ ] Add preferred language settings.
+- [ ] Add classroom role settings.
+- [ ] Add timezone-aware activity dates.
+- [ ] Add profile export action.
+- [ ] Add account deletion request UI.
+- [ ] Add session logout-all UI placeholder.
+- [ ] Add saved phrase collections.
+- [ ] Add phrase tags.
+- [ ] Add phrase notes.
+- [ ] Add phrase search and filters.
+- [ ] Add recent translation history.
+- [ ] Add translation retry action.
+- [ ] Add translation confidence indicator.
+- [ ] Add translation source/context field.
+- [ ] Add language direction persistence.
+- [ ] Add keyboard shortcuts for translate and speak.
+- [ ] Add copy translation action.
+- [ ] Add shareable translation card.
+- [ ] Add pronunciation speed control.
+- [ ] Add voice selection control.
+- [ ] Add audio download progress state.
+- [ ] Add audio file expiry and privacy messaging.
+- [ ] Add offline audio cache metadata.
+- [ ] Add PDF drag-and-drop upload zone.
+- [ ] Add PDF upload progress state.
+- [ ] Add PDF size and MIME validation.
+- [ ] Add PDF page count and metadata extraction.
+- [ ] Add PDF text search.
+- [ ] Add PDF document detail route.
+- [ ] Add PDF preview panel.
+- [ ] Add PDF parsed-text copy action.
+- [ ] Add PDF reprocess action.
+- [ ] Add PDF delete/archive state.
+- [ ] Add PDF language detection.
+- [ ] Add PDF OCR page markers.
+- [ ] Add PDF parsing error recovery.
+- [ ] Add library filters by subject.
+- [ ] Add library filters by grade.
+- [ ] Add library sort by recent.
+- [ ] Add library sort by size.
+- [ ] Add library storage usage indicator.
+- [ ] Add resource download queue.
+- [ ] Add resource sync status.
+- [ ] Add resource access permissions.
+- [ ] Add classroom dashboard summary cards.
+- [ ] Add classroom roster model.
+- [ ] Add classroom lesson assignment model.
+- [ ] Add assignment completion tracking.
+- [ ] Add teacher notes workspace.
+- [ ] Add lesson plan templates.
+- [ ] Add lesson plan duplication.
+- [ ] Add lesson plan export.
+- [ ] Add daily teaching prompt.
+- [ ] Add teacher quick actions.
+- [ ] Add community contribution drafts.
+- [ ] Add contribution edit flow.
+- [ ] Add contribution status timeline.
+- [ ] Add contribution moderation feedback.
+- [ ] Add duplicate phrase detection.
+- [ ] Add source attribution fields.
+- [ ] Add community search.
+- [ ] Add contributor profile summary.
+- [ ] Add admin moderation queue.
+- [ ] Add admin audit log model.
+- [ ] Add rate limiting for AI procedures.
+- [ ] Add request size limits and file quotas.
+- [ ] Add structured server error responses.
+- [ ] Add request correlation IDs.
+- [ ] Add privacy-safe analytics events.
+- [ ] Add performance telemetry dashboard.
+- [ ] Add accessible loading and error states.
+- [ ] Add reduced-motion preference handling.
+- [ ] Add keyboard navigation audit.
+- [ ] Add screen-reader labels audit.
+- [ ] Add PWA manifest and install prompt.
+- [ ] Add service-worker cache strategy.
+- [ ] Add offline mutation queue.
+- [ ] Add connectivity recovery banner.
+- [ ] Add feature flags for experimental AI.
+- [ ] Add environment health page.
+- [ ] Add API integration status cards.
+- [ ] Add test fixtures for PDF parsing.
+- [ ] Add unit tests for OCR selection.
+- [ ] Add unit tests for TTS provider selection.
+- [ ] Add authenticated route tests.
+- [ ] Add upload security tests.
+- [ ] Add accessibility smoke tests.
+- [ ] Add mobile regression screenshots.
+- [ ] Add production deployment checklist.
+- [ ] Add product architecture documentation update.
+
+## Expansion milestone history
+
+- [x] Create and validate reusable `palash-product-builder` skill package.
+- [x] Add cloud OCR fallback for sparse or image-only PDF text layers.
+- [x] Persist PDF extraction provenance and show OCR fallback badges.
+- [x] Add ElevenLabs provider adapter and validate the configured credential.
+- [x] Add protected MP3 generation, storage metadata, download, and audio history.
+- [x] Add profile learning ledger with activity and phrase-mastery charts.
+- [x] Add profile export and language/practice preferences.
+- [x] Add searchable product map exposing 52 coherent modules across Language, Audio, Classroom, Library, Community, and Operations.
+- [x] Fix Profile route hook-order runtime regression and re-verify screenshots.
+- [x] Run final typecheck, Vitest suite, and production build after the expansion.

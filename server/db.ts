@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { documents, InsertUser, learningProgress, translationCache, users } from "../drizzle/schema";
+import { audioArtifacts, documents, InsertUser, learningProgress, translationCache, users } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -86,6 +86,19 @@ export async function listDocuments(userId: number) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(documents).where(eq(documents.userId, userId)).orderBy(desc(documents.createdAt));
+}
+
+export async function listAudioArtifacts(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(audioArtifacts).where(eq(audioArtifacts.userId, userId)).orderBy(desc(audioArtifacts.createdAt));
+}
+
+export async function createAudioArtifact(input: typeof audioArtifacts.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.insert(audioArtifacts).values(input);
+  return { id: Number(result[0].insertId), ...input };
 }
 
 export async function createDocument(input: typeof documents.$inferInsert) {
