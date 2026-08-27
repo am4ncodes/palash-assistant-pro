@@ -148,3 +148,8 @@
 - [x] Split Profile chart code into a lazy-loaded route chunk with a loading fallback.
 - [x] Add focused tests for connection state, error notification deduplication, and lazy chart loading.
 - [x] Verify the Learn route, HMR websocket, Profile bundle output, and responsive banner behavior.
+
+## HMR regression history
+
+- [x] Stop Vite from emitting a localhost:5173 websocket target in the managed preview.
+- [x] Restart and verify a fresh preview load has no HMR websocket console error.

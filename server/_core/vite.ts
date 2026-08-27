@@ -7,12 +7,12 @@ import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 
 export async function setupVite(app: Express, server: Server) {
-  const hmrClientPort = Number(process.env.PORT || "3000");
   const serverOptions = {
     middlewareMode: true,
-    // The preview proxy exposes the full-stack server port, not Vite's default 5173.
-    // Keep HMR on the shared HTTP server and tell the browser which proxied port to use.
-    hmr: { server, host: "localhost", port: hmrClientPort, clientPort: hmrClientPort, protocol: "ws" },
+    // The managed preview proxy serves HTTP reliably but does not expose the
+    // internal Vite websocket. Disable HMR injection so clients never attempt
+    // the misleading localhost:5173 fallback; the page remains refreshable.
+    hmr: false,
     allowedHosts: true as const,
   };
 
