@@ -17,10 +17,11 @@ const routes = [
   { path: "/learn", component: lazy(() => import("./pages/LearnPage")) },
   { path: "/library", component: lazy(() => import("./pages/LibraryPage")) },
   { path: "/community", component: lazy(() => import("./pages/CommunityPage")) },
+  { path: "/profile", component: lazy(() => import("./pages/ProfilePage")) },
   { path: "/404", component: lazy(() => import("./pages/NotFound")) },
 ];
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   const pathname = useLocation();
   const entry = resolveRoute(routes, pathname);
   const Page = entry?.route.component ?? routes[routes.length - 1].component;

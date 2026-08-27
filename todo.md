@@ -7,6 +7,11 @@
 - [x] Add progressive enhancement fallbacks for offline mode and browser capabilities.
 - [x] Write the architecture implementation guide with concrete code examples.
 - [x] Run checks, build, and verify route transitions and shared state.
-- [ ] Add a fifth dashboard-style community page and deepen all route interactions.
-- [ ] Refine shared shell, navigation, responsive behavior, and page-level polish.
-- [ ] Run final checks, browser verification, and create a new GitHub repository containing the complete source and documentation.
+- [x] Add a fifth dashboard-style community page and deepen all route interactions.
+- [x] Refine shared shell, navigation, responsive behavior, and page-level polish.
+- [x] Run final checks, browser verification, and create a new GitHub repository containing the complete source and documentation.
+- [x] Upgrade project to full-stack auth, database, file storage, and backend routes.
+- [x] Add real AI translation and text-to-speech integration behind secure server routes.
+- [x] Add authenticated profile and persistent progress UI.
+- [x] Add PDF upload, parsing, storage, and document viewer flow.
+- [x] Validate security, type checks, build, and user flows.
