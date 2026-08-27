@@ -226,6 +226,26 @@
     background: repeating-linear-gradient(to right, rgba(45, 107, 74, 0.35) 0, rgba(45, 107, 74, 0.35) 4px, transparent 4px, transparent 8px);
   }
 
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+    color: #6b746a;
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .section-eyebrow::before {
+    width: 1.75rem;
+    height: 1px;
+    background: #e45d32;
+    content: "";
+  }
+
   .nav-link {
     position: relative;
     color: #566055;
