@@ -12,7 +12,7 @@ export async function setupVite(app: Express, server: Server) {
     middlewareMode: true,
     // The preview proxy exposes the full-stack server port, not Vite's default 5173.
     // Keep HMR on the shared HTTP server and tell the browser which proxied port to use.
-    hmr: { server, clientPort: hmrClientPort },
+    hmr: { server, host: "localhost", port: hmrClientPort, clientPort: hmrClientPort, protocol: "ws" },
     allowedHosts: true as const,
   };
 

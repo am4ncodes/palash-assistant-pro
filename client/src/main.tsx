@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { startLogin } from "./const";
+import { isUnauthorizedApiError, notifyApiError } from "./lib/apiErrors";
 import "./index.css";
 
 const queryClient = new QueryClient({
@@ -16,20 +17,22 @@ const queryClient = new QueryClient({
 });
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
-  if (!(error instanceof TRPCClientError)) return;
-  if (typeof window === "undefined") return;
-
-  const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
-
-  if (!isUnauthorized) return;
-
+  if (!(error instanceof TRPCClientError)) return false;
+  if (typeof window === "undefined") return false;
+  if (!isUnauthorizedApiError(error)) return false;
   startLogin();
+  return true;
+};
+
+const handleApiError = (error: unknown, kind: "query" | "mutation") => {
+  const redirected = redirectToLoginIfUnauthorized(error);
+  if (!redirected) notifyApiError(error, kind);
 };
 
 queryClient.getQueryCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.query.state.error;
-    redirectToLoginIfUnauthorized(error);
+    handleApiError(error, "query");
     console.error("[API Query Error]", error);
   }
 });
@@ -37,7 +40,7 @@ queryClient.getQueryCache().subscribe(event => {
 queryClient.getMutationCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.mutation.state.error;
-    redirectToLoginIfUnauthorized(error);
+    handleApiError(error, "mutation");
     console.error("[API Mutation Error]", error);
   }
 });

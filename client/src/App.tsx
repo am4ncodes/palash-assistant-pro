@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AppStoreProvider } from "./contexts/AppStore";
+import { ConnectionStatusProvider } from "./contexts/ConnectionStatus";
 import { resolveRoute, useLocation } from "./lib/router";
 
 const routes = [
@@ -31,7 +32,7 @@ function Router() {
 }
 
 function App() {
-  return <ErrorBoundary><ThemeProvider defaultTheme="light"><TooltipProvider><AppStoreProvider><Toaster /><Router /></AppStoreProvider></TooltipProvider></ThemeProvider></ErrorBoundary>;
+  return <ErrorBoundary><ThemeProvider defaultTheme="light"><TooltipProvider><ConnectionStatusProvider><AppStoreProvider><Toaster /><Router /></AppStoreProvider></ConnectionStatusProvider></TooltipProvider></ThemeProvider></ErrorBoundary>;
 }
 
 export default App;

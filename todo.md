@@ -139,3 +139,12 @@
 - [x] Fix Learn-route tRPC `Failed to fetch` connectivity error.
 - [x] Fix Vite HMR websocket connection configuration for the proxied preview host.
 - [x] Restart development services and verify route/API/browser-console health.
+
+## Reliability and performance pass
+
+- [x] Package the proven Palash workflow as a validated reusable skill artifact.
+- [x] Add a global connection/retry status banner with accessible retry controls.
+- [x] Add deduplicated global API error toasts with actionable retry messaging.
+- [x] Split Profile chart code into a lazy-loaded route chunk with a loading fallback.
+- [x] Add focused tests for connection state, error notification deduplication, and lazy chart loading.
+- [x] Verify the Learn route, HMR websocket, Profile bundle output, and responsive banner behavior.

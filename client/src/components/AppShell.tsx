@@ -6,6 +6,7 @@
 import { Activity, ArrowUpRight, Wifi, WifiOff } from "lucide-react";
 import { Link } from "@/lib/router";
 import { useAppStore } from "@/contexts/AppStore";
+import ConnectionBanner from "@/components/ConnectionBanner";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { savedPhrases, lastAction } = useAppStore();
@@ -13,6 +14,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#f8f2e8] text-[#20251f]">
+      <ConnectionBanner />
       <header className="sticky top-0 z-40 border-b border-[#20251f]/10 bg-[#f8f2e8]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-12">
           <Link to="/" className="flex items-center gap-3" aria-label="Palash dashboard">
