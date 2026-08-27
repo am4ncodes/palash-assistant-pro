@@ -88,6 +88,20 @@ export async function listDocuments(userId: number) {
   return db.select().from(documents).where(eq(documents.userId, userId)).orderBy(desc(documents.createdAt));
 }
 
+export async function getDocument(userId: number, id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(documents).where(and(eq(documents.userId, userId), eq(documents.id, id))).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function updateDocumentExtraction(userId: number, id: number, input: { extractedText: string; extractionMode: "text-layer" | "cloud-ocr"; pageCount: number }) {
+  const db = await getDb();
+  if (!db) return null;
+  await db.update(documents).set(input).where(and(eq(documents.userId, userId), eq(documents.id, id)));
+  return getDocument(userId, id);
+}
+
 export async function listAudioArtifacts(userId: number) {
   const db = await getDb();
   if (!db) return [];

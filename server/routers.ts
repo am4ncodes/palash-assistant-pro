@@ -4,13 +4,14 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { invokeLLM } from "./_core/llm";
 import { systemRouter } from "./_core/systemRouter";
 import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { createAudioArtifact, createDocument, cacheTranslation, getDb, getProgress, listAudioArtifacts, listDocuments, saveProgress } from "./db";
+import { createAudioArtifact, createDocument, cacheTranslation, getDb, getDocument, getProgress, listAudioArtifacts, listDocuments, saveProgress, updateDocumentExtraction } from "./db";
 import { documents, users } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { storageGetSignedUrl, storagePut } from "./storage";
 import { PDFParse } from "pdf-parse";
 import { synthesizeSpeech } from "./tts";
 import { shouldUseOcr } from "./ocr";
+import { assertRateLimit } from "./limits";
 
 const translationInput = z.object({
   sourceLanguage: z.string().min(2).max(32),
@@ -49,6 +50,7 @@ export const appRouter = router({
   }),
   ai: router({
     translate: protectedProcedure.input(translationInput).mutation(async ({ ctx, input }) => {
+      assertRateLimit(`translate:${ctx.user.id}`, 30, 60_000);
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
@@ -60,7 +62,8 @@ export const appRouter = router({
       await cacheTranslation(ctx.user.id, { sourceLanguage: input.sourceLanguage, targetLanguage: input.targetLanguage, sourceText: input.text, translatedText });
       return { translatedText, source: "ai", cached: true };
     }),
-    speak: protectedProcedure.input(z.object({ text: z.string().min(1).max(2000), language: z.string().min(2).max(32) })).mutation(async ({ input }) => {
+    speak: protectedProcedure.input(z.object({ text: z.string().min(1).max(2000), language: z.string().min(2).max(32) })).mutation(async ({ ctx, input }) => {
+      assertRateLimit(`speak:${ctx.user.id}`, 30, 60_000);
       const response = await invokeLLM({
         model: "gpt-5-mini",
         messages: [
@@ -72,6 +75,7 @@ export const appRouter = router({
     }),
     audioHistory: protectedProcedure.query(({ ctx }) => listAudioArtifacts(ctx.user.id)),
     generateAudio: protectedProcedure.input(z.object({ text: z.string().min(1).max(2000), language: z.string().min(2).max(32), voiceId: z.string().max(64).optional() })).mutation(async ({ ctx, input }) => {
+      assertRateLimit(`audio:${ctx.user.id}`, 10, 60_000);
       const audio = await synthesizeSpeech(input);
       return createAudioArtifact({ userId: ctx.user.id, text: input.text, language: input.language, fileKey: audio.key, fileUrl: audio.url });
     }),
@@ -79,6 +83,7 @@ export const appRouter = router({
   documents: router({
     list: protectedProcedure.query(({ ctx }) => listDocuments(ctx.user.id)),
     upload: protectedProcedure.input(z.object({ filename: z.string().min(1).max(255), mimeType: z.literal("application/pdf"), dataBase64: z.string().min(32).max(70_000_000) })).mutation(async ({ ctx, input }) => {
+      assertRateLimit(`upload:${ctx.user.id}`, 8, 300_000);
       const base64 = input.dataBase64.replace(/^data:application\/pdf;base64,/, "");
       const buffer = Buffer.from(base64, "base64");
       if (buffer.length > 50 * 1024 * 1024) throw new Error("PDF must be 50MB or smaller");
@@ -99,6 +104,26 @@ export const appRouter = router({
         extractionMode = "cloud-ocr";
       }
       return createDocument({ userId: ctx.user.id, filename: input.filename, mimeType: input.mimeType, fileKey: stored.key, fileUrl: stored.url, extractedText: extractedText.slice(0, 100_000), extractionMode, pageCount: parsed.total });
+    }),
+    reprocess: protectedProcedure.input(z.object({ id: z.number().int().positive() })).mutation(async ({ ctx, input }) => {
+      assertRateLimit(`reprocess:${ctx.user.id}`, 8, 300_000);
+      const document = await getDocument(ctx.user.id, input.id);
+      if (!document) throw new Error("Document not found");
+      const signedUrl = await storageGetSignedUrl(document.fileKey);
+      const source = await fetch(signedUrl);
+      if (!source.ok) throw new Error("Stored PDF is unavailable");
+      const buffer = Buffer.from(await source.arrayBuffer());
+      const parser = new PDFParse({ data: buffer });
+      const parsed = await parser.getText();
+      await parser.destroy();
+      let extractedText = parsed.text.trim();
+      let extractionMode: "text-layer" | "cloud-ocr" = "text-layer";
+      if (shouldUseOcr(extractedText)) {
+        const ocrResponse = await invokeLLM({ model: "gemini-3-flash-preview", messages: [{ role: "user", content: [{ type: "text", text: "Extract all readable text from this scanned PDF. Preserve page order and return plain text only." }, { type: "file_url", file_url: { url: signedUrl, mime_type: "application/pdf" } }] }] });
+        extractedText = responseText(ocrResponse);
+        extractionMode = "cloud-ocr";
+      }
+      return updateDocumentExtraction(ctx.user.id, input.id, { extractedText: extractedText.slice(0, 100_000), extractionMode, pageCount: parsed.total });
     }),
   }),
 });

@@ -1,6 +1,6 @@
 /* Feature module: secure AI translation, cloud audio, and progressive TTS fallback. */
-import { useState } from "react";
-import { ArrowLeftRight, BookMarked, Headphones, Send, Wifi, WifiOff } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeftRight, BookMarked, Copy, Headphones, Send, Share2, Wifi, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import AppShell from "@/components/AppShell";
 import { phrases } from "@/data/catalog";
@@ -20,7 +20,23 @@ export default function TranslatePage() {
   const [input, setInput] = useState(phrases[0].hindi);
   const [result, setResult] = useState(phrases[0].santhali);
   const [audioUrl, setAudioUrl] = useState("");
+  const [speed, setSpeed] = useState(0.82);
+  const [voiceId, setVoiceId] = useState("EXAVITQu4vr4xnSDxMaL");
+  const [history, setHistory] = useState<string[]>([]);
   const online = navigator.onLine;
+
+  useEffect(() => {
+    const storedDirection = window.localStorage.getItem("palash-direction");
+    if (storedDirection === "sat-to-hi") setDirection("sat-to-hi");
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") { event.preventDefault(); void translate(); }
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "s") { event.preventDefault(); void speak(); }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [input, result, direction, auth.isAuthenticated]);
+
+  useEffect(() => { window.localStorage.setItem("palash-direction", direction); }, [direction]);
 
   async function speak() {
     if (!auth.isAuthenticated) { startLogin(); return; }
@@ -30,7 +46,7 @@ export default function TranslatePage() {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(prepared.speechText);
       utterance.lang = "hi-IN";
-      utterance.rate = 0.82;
+      utterance.rate = speed;
       window.speechSynthesis.speak(utterance);
     } catch { toast.error("Speech preparation unavailable", { description: "You can still read the translation." }); }
   }
@@ -38,7 +54,7 @@ export default function TranslatePage() {
   async function downloadCloudAudio() {
     if (!auth.isAuthenticated) { startLogin(); return; }
     try {
-      const audio = await audioMutation.mutateAsync({ text: result, language: direction === "hi-to-sat" ? "Santhali" : "Hindi" });
+      const audio = await audioMutation.mutateAsync({ text: result, language: direction === "hi-to-sat" ? "Santhali" : "Hindi", voiceId });
       if (audio?.fileUrl) setAudioUrl(audio.fileUrl);
       await audioHistoryQuery.refetch();
       toast.success("High-quality audio ready", { description: "Your MP3 is ready to download." });
@@ -57,8 +73,19 @@ export default function TranslatePage() {
     try {
       const response = await translateMutation.mutateAsync({ sourceLanguage: direction === "hi-to-sat" ? "Hindi" : "Santhali", targetLanguage: direction === "hi-to-sat" ? "Santhali" : "Hindi", text: input.trim() });
       setResult(response.translatedText);
+      setHistory((current) => [input.trim(), ...current].slice(0, 5));
       toast.success("AI translation ready", { description: "Saved to your secure translation cache." });
     } catch { toast.error("Translation unavailable", { description: "Try a validated phrase while offline." }); }
+  }
+
+  async function copyResult() {
+    await navigator.clipboard?.writeText(result);
+    toast.success("Translation copied");
+  }
+
+  async function shareResult() {
+    if (navigator.share) await navigator.share({ title: "Palash translation", text: `${input}\n${result}` });
+    else await copyResult();
   }
 
   function swap() {
@@ -98,13 +125,13 @@ export default function TranslatePage() {
                   <div className="mt-8 flex items-center justify-between"><span className="font-mono text-[10px] text-[#9a9f97]">{translateMutation.isPending ? "AI is translating…" : auth.isAuthenticated ? "Ready for secure AI" : "Sign in to use AI"}</span><button disabled={translateMutation.isPending} onClick={translate} className="inline-flex items-center gap-2 rounded-full bg-[#20251f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#2d6b4a] disabled:opacity-50">Translate <Send size={14} /></button></div>
                 </div>
                 <div className="bg-[#f2f6ee] p-7">
-                  <div className="flex items-center justify-between"><div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6b746a]">AI result</div><div className="flex items-center gap-2"><button onClick={speak} className="grid size-9 place-items-center rounded-full bg-white text-[#2d6b4a] hover:bg-[#e45d32] hover:text-white" aria-label="Speak translation"><Headphones size={16} /></button><button onClick={downloadCloudAudio} disabled={audioMutation.isPending} className="rounded-full border border-[#2d6b4a]/20 bg-white px-3 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-[#2d6b4a] hover:bg-[#2d6b4a] hover:text-white disabled:opacity-50">{audioMutation.isPending ? "Rendering…" : "Make MP3"}</button></div></div>
+                  <div className="flex items-center justify-between"><div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#6b746a]">AI result</div><div className="flex flex-wrap items-center justify-end gap-2"><button onClick={copyResult} className="grid size-9 place-items-center rounded-full bg-white text-[#2d6b4a] hover:bg-[#e45d32] hover:text-white" aria-label="Copy translation"><Copy size={15} /></button><button onClick={shareResult} className="grid size-9 place-items-center rounded-full bg-white text-[#2d6b4a] hover:bg-[#e45d32] hover:text-white" aria-label="Share translation"><Share2 size={15} /></button><button onClick={speak} className="grid size-9 place-items-center rounded-full bg-white text-[#2d6b4a] hover:bg-[#e45d32] hover:text-white" aria-label="Speak translation"><Headphones size={16} /></button><button onClick={downloadCloudAudio} disabled={audioMutation.isPending} className="rounded-full border border-[#2d6b4a]/20 bg-white px-3 py-2 font-mono text-[9px] uppercase tracking-[0.1em] text-[#2d6b4a] hover:bg-[#2d6b4a] hover:text-white disabled:opacity-50">{audioMutation.isPending ? "Rendering…" : "Make MP3"}</button></div></div>
                   <div className="mt-8 min-h-[180px] font-display text-4xl leading-tight text-[#2d6b4a]">{result}</div>
-                  <div className="mt-8 flex flex-wrap items-center justify-between gap-4"><span className="font-mono text-[10px] leading-4 text-[#6b746a]">{online ? "AI-generated · cached server-side" : "Validated phrase · offline"}</span>{audioUrl && <a href={audioUrl} download className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#e45d32] hover:underline">Download MP3</a>}<button onClick={() => { savePhrase(); toast.success("Saved across your profile"); }} className="inline-flex items-center gap-2 rounded-full border border-[#2d6b4a]/25 px-4 py-2.5 text-sm font-semibold text-[#2d6b4a] hover:bg-white"><BookMarked size={14} /> Save</button></div>
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-4"><div className="flex flex-wrap items-center gap-2"><label className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#6b746a]">Speed <select value={speed} onChange={(event) => setSpeed(Number(event.target.value))} className="ml-1 rounded-full border border-[#20251f]/15 bg-white px-2 py-1"><option value="0.62">Slow</option><option value="0.82">Normal</option><option value="1">Fast</option></select></label><label className="font-mono text-[9px] uppercase tracking-[0.1em] text-[#6b746a]">Voice <select value={voiceId} onChange={(event) => setVoiceId(event.target.value)} className="ml-1 max-w-24 rounded-full border border-[#20251f]/15 bg-white px-2 py-1"><option value="EXAVITQu4vr4xnSDxMaL">Rachel</option><option value="21m00Tcm4TlvDq8ikWAM">Rachel alt</option></select></label></div><span className="font-mono text-[10px] leading-4 text-[#6b746a]">{online ? "AI-generated · cached server-side" : "Validated phrase · offline"}</span>{audioUrl && <a href={audioUrl} download className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#e45d32] hover:underline">Download MP3</a>}<button onClick={() => { savePhrase(); toast.success("Saved across your profile"); }} className="inline-flex items-center gap-2 rounded-full border border-[#2d6b4a]/25 px-4 py-2.5 text-sm font-semibold text-[#2d6b4a] hover:bg-white"><BookMarked size={14} /> Save</button></div>
                 </div>
               </div>
             </div>
-            {audioHistoryQuery.data?.length ? <div className="mt-6 border-t border-[#20251f]/10 pt-5"><div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#6b746a]">Recent cloud audio</div><div className="mt-3 flex flex-wrap gap-2">{audioHistoryQuery.data.slice(0, 3).map((audio) => <a key={audio.id} href={audio.fileUrl} download className="rounded-full border border-[#20251f]/12 bg-white px-3 py-2 text-xs text-[#566055] hover:border-[#e45d32]">{audio.text.slice(0, 24)}…</a>)}</div></div> : null}
+            {history.length > 0 && <div className="mt-6 border-t border-[#20251f]/10 pt-5"><div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#6b746a]">Recent translations</div><div className="mt-3 flex flex-wrap gap-2">{history.map((item, index) => <button key={`${item}-${index}`} onClick={() => setInput(item)} className="rounded-full border border-[#20251f]/12 bg-white px-3 py-2 text-xs text-[#566055] hover:border-[#e45d32]">{item.slice(0, 24)}…</button>)}</div></div>}{audioHistoryQuery.data?.length ? <div className="mt-6 border-t border-[#20251f]/10 pt-5"><div className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#6b746a]">Recent cloud audio</div><div className="mt-3 flex flex-wrap gap-2">{audioHistoryQuery.data.slice(0, 3).map((audio) => <a key={audio.id} href={audio.fileUrl} download className="rounded-full border border-[#20251f]/12 bg-white px-3 py-2 text-xs text-[#566055] hover:border-[#e45d32]">{audio.text.slice(0, 24)}…</a>)}</div></div> : null}
           </div>
           <aside className="rounded-[28px] bg-[#20251f] p-7 text-[#f8f2e8]"><div className="field-stamp field-stamp--dark">PS</div><div className="mt-12 font-display text-4xl leading-none">Start with the phrases teachers use most.</div><div className="mt-7 space-y-2">{phrases.map((phrase) => <button key={phrase.id} onClick={() => { setInput(direction === "hi-to-sat" ? phrase.hindi : phrase.santhali); setResult(direction === "hi-to-sat" ? phrase.santhali : phrase.hindi); }} className="block w-full border-b border-[#f8f2e8]/10 py-3 text-left text-sm text-[#f8f2e8]/70 transition hover:text-[#f1b36d]">{direction === "hi-to-sat" ? phrase.hindi : phrase.santhali}</button>)}</div></aside>
         </div>

@@ -1,0 +1,10 @@
+{
+  "name": "Palash Assistant",
+  "short_name": "Palash",
+  "description": "Offline-first Hindi ↔ Santhali classroom support for teachers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f2e8",
+  "theme_color": "#20251f",
+  "icons": []
+}
