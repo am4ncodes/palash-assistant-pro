@@ -8,7 +8,12 @@ import App from "./App";
 import { startLogin } from "./const";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 2, retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 4000), refetchOnReconnect: true },
+    mutations: { retry: 1, retryDelay: 800 },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;

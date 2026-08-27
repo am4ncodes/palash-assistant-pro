@@ -133,3 +133,9 @@
 - [x] Add searchable product map exposing 52 coherent modules across Language, Audio, Classroom, Library, Community, and Operations.
 - [x] Fix Profile route hook-order runtime regression and re-verify screenshots.
 - [x] Run final typecheck, Vitest suite, and production build after the expansion.
+
+## Bug fix history
+
+- [x] Fix Learn-route tRPC `Failed to fetch` connectivity error.
+- [x] Fix Vite HMR websocket connection configuration for the proxied preview host.
+- [x] Restart development services and verify route/API/browser-console health.

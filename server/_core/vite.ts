@@ -7,9 +7,12 @@ import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 
 export async function setupVite(app: Express, server: Server) {
+  const hmrClientPort = Number(process.env.PORT || "3000");
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    // The preview proxy exposes the full-stack server port, not Vite's default 5173.
+    // Keep HMR on the shared HTTP server and tell the browser which proxied port to use.
+    hmr: { server, clientPort: hmrClientPort },
     allowedHosts: true as const,
   };
 
