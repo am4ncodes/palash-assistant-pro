@@ -16,6 +16,7 @@ const routes = [
   { path: "/translate", component: lazy(() => import("./pages/TranslatePage")) },
   { path: "/learn", component: lazy(() => import("./pages/LearnPage")) },
   { path: "/library", component: lazy(() => import("./pages/LibraryPage")) },
+  { path: "/community", component: lazy(() => import("./pages/CommunityPage")) },
   { path: "/404", component: lazy(() => import("./pages/NotFound")) },
 ];
 
