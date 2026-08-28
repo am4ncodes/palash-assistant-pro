@@ -153,3 +153,15 @@
 
 - [x] Stop Vite from emitting a localhost:5173 websocket target in the managed preview.
 - [x] Restart and verify a fresh preview load has no HMR websocket console error.
+
+## HMR follow-ups and 120-feature expansion
+
+- [x] Add a local-only HMR environment flag for direct development.
+- [x] Add a development refresh-to-update hint when managed HMR is disabled.
+- [x] Add a console-regression smoke check for websocket and API errors.
+- [x] Expand the product registry from 52 to 120 coherent modules.
+- [x] Add grouped filtering, search, status counts, and detail views for the expanded registry.
+- [x] Add a clear live/beta/planned status system for all 120 modules.
+- [x] Validate routes, feature discovery, HMR behavior, tests, and production build.
+- [x] Investigate and harden the storage proxy fallback when the Forge endpoint is unavailable.
+- [x] Exercise VITE_ENABLE_LOCAL_HMR=1 directly and document the local HMR command and smoke result.

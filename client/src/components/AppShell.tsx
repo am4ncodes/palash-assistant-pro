@@ -11,6 +11,7 @@ import ConnectionBanner from "@/components/ConnectionBanner";
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const { savedPhrases, lastAction } = useAppStore();
   const online = navigator.onLine;
+  const managedPreview = import.meta.env.DEV && import.meta.env.VITE_ENABLE_LOCAL_HMR !== "1";
 
   return (
     <div className="min-h-screen bg-[#f8f2e8] text-[#20251f]">
@@ -36,7 +37,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <nav className="flex gap-5 overflow-x-auto border-b border-[#20251f]/10 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#6b746a] lg:hidden" aria-label="Mobile application navigation"><Link to="/translate" className="shrink-0 hover:text-[#e45d32]">Translate</Link><Link to="/learn" className="shrink-0 hover:text-[#e45d32]">Learn</Link><Link to="/library" className="shrink-0 hover:text-[#e45d32]">Library</Link><Link to="/community" className="shrink-0 hover:text-[#e45d32]">Community</Link><Link to="/profile" className="shrink-0 hover:text-[#e45d32]">Profile</Link><Link to="/features" className="shrink-0 hover:text-[#e45d32]">Product map</Link></nav>
-      <div className="mx-auto flex max-w-[1380px] items-center justify-between border-b border-[#20251f]/10 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#6b746a] sm:px-8 lg:px-12"><span className="flex items-center gap-2"><Activity size={13} className="text-[#e45d32]" /> {lastAction}</span><span>{savedPhrases} saved phrases <ArrowUpRight size={12} className="ml-1 inline" /></span></div>
+      <div className="mx-auto flex max-w-[1380px] flex-wrap items-center justify-between gap-3 border-b border-[#20251f]/10 px-5 py-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[#6b746a] sm:px-8 lg:px-12"><span className="flex items-center gap-2"><Activity size={13} className="text-[#e45d32]" /> {lastAction}</span><div className="flex items-center gap-4"><span>{savedPhrases} saved phrases <ArrowUpRight size={12} className="ml-1 inline" /></span>{managedPreview && <button onClick={() => window.location.reload()} className="rounded-full border border-[#20251f]/15 px-2.5 py-1 text-[9px] font-semibold text-[#e45d32] hover:bg-[#fff0e7]" title="Refresh the page for the latest code">Refresh to update</button>}</div></div>
       {children}
     </div>
   );

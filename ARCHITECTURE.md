@@ -195,3 +195,13 @@ PDF ingestion follows a two-stage parser. The server first uses the PDF text lay
 Profile analytics are derived from the same durable progress contract used by the learning page. The chart layer displays a weekly activity view and per-phrase mastery with readable summary cards, while export produces a portable JSON snapshot. The `FeaturesPage` acts as a searchable product map with 52 grouped modules across language, audio, classroom, library, community, and operations; status labels intentionally distinguish live behavior from in-motion modules.
 
 The reusable process is packaged separately at `/home/ubuntu/skills/palash-product-builder/SKILL.md`. It captures the sequence for routing, local-first state, secure AI procedures, storage-backed document ingestion, analytics, testing, and repository handoff.
+
+
+## 8. Product-scale registry and preview controls
+
+The Product Map registry now contains 120 modules across language, audio, classroom, library, community, operations, accessibility, and insights. Every module has a stable id, group, description, accent, and explicit `Live`, `Beta`, or `Planned` maturity so breadth does not masquerade as shipped behavior.
+
+Managed preview keeps HMR disabled because its proxy cannot expose the internal websocket reliably. Direct local development can opt in with `VITE_ENABLE_LOCAL_HMR=1`. In managed preview, `AppShell` exposes a refresh-to-update control. `pnpm check:browser-console` scans fresh browser logs for known websocket/API regression signatures when run with `BROWSER_LOG_SINCE`.
+
+
+Local-HMR smoke verification: `PORT=3010 VITE_ENABLE_LOCAL_HMR=1 pnpm dev` served the app on port 3010 with `/@vite/client` present; a direct browser load rendered the root page and the console contained only the normal React DevTools informational message, with no websocket or runtime errors. The isolated process was terminated after verification.

@@ -41,8 +41,11 @@ export function registerStorageProxy(app: Express) {
       res.set("Cache-Control", "no-store");
       res.redirect(307, url);
     } catch (err) {
-      console.error("[StorageProxy] failed:", err);
-      res.status(502).send("Storage proxy error");
+      // Storage can be temporarily unreachable while the offline-first app is
+      // still healthy. Keep this as a retryable service response and a warning,
+      // not a browser-facing application error.
+      console.warn("[StorageProxy] temporarily unavailable:", err instanceof Error ? err.message : String(err));
+      res.status(503).set("Retry-After", "10").send("Storage temporarily unavailable. Try again when online.");
     }
   });
 }

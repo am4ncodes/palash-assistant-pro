@@ -7,12 +7,12 @@ import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 
 export async function setupVite(app: Express, server: Server) {
+  const localHmrEnabled = process.env.VITE_ENABLE_LOCAL_HMR === "1";
   const serverOptions = {
     middlewareMode: true,
-    // The managed preview proxy serves HTTP reliably but does not expose the
-    // internal Vite websocket. Disable HMR injection so clients never attempt
-    // the misleading localhost:5173 fallback; the page remains refreshable.
-    hmr: false,
+    // Managed preview disables websocket injection because its proxy does not
+    // expose the internal Vite socket. Direct local development can opt in.
+    hmr: localHmrEnabled ? { server } : false,
     allowedHosts: true as const,
   };
 
@@ -42,7 +42,10 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      const managedPage = localHmrEnabled
+        ? page
+        : page.replace('<script type="module" src="/@vite/client"></script>', "");
+      res.status(200).set({ "Content-Type": "text/html" }).end(managedPage);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);

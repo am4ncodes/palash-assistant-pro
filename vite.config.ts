@@ -150,7 +150,18 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+const localHmrEnabled = process.env.VITE_ENABLE_LOCAL_HMR === "1";
+function managedPreviewPlugin() {
+  return {
+    name: "palash-managed-preview",
+    enforce: "post" as const,
+    transformIndexHtml(html: string) {
+      if (localHmrEnabled) return html;
+      return html.replace('<script type="module" src="/@vite/client"></script>', "");
+    },
+  };
+}
+const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), managedPreviewPlugin()];
 
 export default defineConfig({
   plugins,
@@ -169,6 +180,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    // Keep managed preview compatible with the proxy. Direct local development
+    // can opt into the normal Vite websocket with VITE_ENABLE_LOCAL_HMR=1.
+    hmr: localHmrEnabled ? undefined : false,
     host: true,
     allowedHosts: [
       ".manuspre.computer",
