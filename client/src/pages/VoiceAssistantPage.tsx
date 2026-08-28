@@ -18,7 +18,7 @@ export default function VoiceAssistantPage() {
   const [listening, setListening] = useState(false);
   const [bars, setBars] = useState<number[]>(Array.from({ length: 28 }, () => 6));
   const [transcript, setTranscript] = useState("");
-  const intervalRef = useRef<number>();
+  const intervalRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (listening) {
