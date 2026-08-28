@@ -138,6 +138,57 @@
   button:active, a:active {
     transform: scale(0.97);
   }
+
+  /* Field card: reusable warm-utility surface for feature pages */
+  .field-card {
+    @apply rounded-2xl border border-[#20251f]/12 bg-[#fffdf8];
+  }
+  .dark .field-card {
+    @apply border-white/12 bg-[#2b3129];
+  }
+
+  .field-input {
+    @apply w-full rounded-lg border border-[#20251f]/16 bg-[#fffdf8] px-3 py-2.5 text-[14px] text-[#20251f] outline-none transition focus:border-[#e45d32] focus:ring-2 focus:ring-[#e45d32]/25;
+  }
+  .dark .field-input {
+    @apply border-white/16 bg-[#232922] text-[#f8f2e8];
+  }
+
+  /* Sohrai-inspired rule: bold repeating chevron band, evoking comb-cut incising
+     used in Jharkhand's Sohrai/Khovar mural tradition (Santhal/Munda/Oraon). */
+  .sohrai-rule {
+    height: 8px;
+    width: 96px;
+    background-image: repeating-linear-gradient(
+      135deg,
+      #e45d32 0px,
+      #e45d32 6px,
+      #20251f 6px,
+      #20251f 8px,
+      transparent 8px,
+      transparent 12px
+    );
+    border-radius: 999px;
+  }
+
+  /* Accessibility toggles set on <html>, controlled from SettingsPage */
+  .high-contrast {
+    filter: contrast(1.18);
+  }
+  .high-contrast .field-card {
+    @apply border-2 border-[#20251f];
+  }
+  .dyslexia-font, .dyslexia-font * {
+    font-family: "Comic Sans MS", "Comic Sans", sans-serif !important;
+    letter-spacing: 0.02em !important;
+  }
+  .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
 }
 
 @layer components {
